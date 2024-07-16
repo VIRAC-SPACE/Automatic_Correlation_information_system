@@ -1,0 +1,383 @@
+<div class="row">
+  <form class="pure-form" name="ctrl" role="form">
+    <div  *ngIf="experimentType=='SFXC'">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <div>
+            <label> Scans </label>
+          </div>
+          <select (ngModelChange)="selectscan($event)" [(ngModel)]="choose_scan" class="form-control" name="choose_scan"
+                  required>
+            <option *ngFor="let scan of scans"> {{scan}} </option>
+          </select>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <div>
+            <label>Select Stations</label>
+          </div>
+          <select (ngModelChange)="selectstations($event)" [(ngModel)]="selectedStation" class="form-control" multiple name="selectedStation"
+                  required>
+            <option *ngFor="let st of stationsForThisScan"> {{st}} </option>
+          </select>
+          <span *ngIf="!stations_selected" style="color:red;">Please select stations</span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <div>
+            <label for="chArray"> Channels </label>
+          </div>
+          <select [(ngModel)]="chArray" class="form-control" id="chArray" multiple name="chArray" required>
+            <option *ngFor="let channel of channelArray" selected="selected"> {{channel}} </option>
+          </select>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+          <label> Data Sources</label>
+          <div *ngFor="let station of selectedStation">
+            <label>{{station}} </label> <input class="form-control" id="data-{{stationNameToLower(station)}}"
+                                               name="dataSources[station]" placeholder="{{datasourcedatafirstpart}}{{stationNameToLower(station)}}{{datasourcedatasecondpart}}"
+                                               type="text"
+                                               value="{{datasourcedatafirstpart}}{{stationNameToLower(station)}}{{datasourcedatasecondpart}}"/>
+            <span *ngIf="!datasourcevalid(station)"
+                  style="color:red;">Please fill data source for station {{station}}</span>
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="start"> Start time: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="scanStartTime" class="form-control" id="start" name="scanStartTime"
+                   placeholder="2008y154d15h22m00s" required type="text"/>
+            <span *ngIf="scanStartTime.length==0" style="color:red;">Please fill start time</span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="msglvl"> Message level: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="msglvl" class="form-control" id="msglvl" min="1" name="msglvl" required type="number"/>
+            <span *ngIf="!msglvl" style="color:red;">Please fill message level</span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="stop"> Stop time: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 form-group">
+          <div class="form-group">
+            <input [(ngModel)]="scanStopTime" class="form-control" id="stop" name="scanStopTime" placeholder="2008y154d15h23m00s"
+                   required type="text"/>
+            <span *ngIf="scanStopTime.length==0" style="color:red;">Please fill stop time</span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="experimentname"> Experiment name: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 ">
+          <div class="form-group">
+            <input [(ngModel)]="experimentname" class="form-control" id="experimentname" name="experimentname" placeholder="F08L1"
+                   required type="text"/>
+            <span *ngIf="experimentname.length==0" style="color:red;">Please fill experiment name</span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="intt"> Integer time: (s) </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="intt" class="form-control" id="intt" min="0.1" name="intt" required step="0.1"
+                   type="number"/>
+            <span *ngIf="!intt" style="color:red;">Please fill integer time </span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="subintt"> Sub integer time: (s) </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="subintt" class="form-control" id="subintt" min="1" name="subintt" type="number"/>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="ref"> Reference station: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <select class="form-control" id="ref" name="refStation">
+              <option *ngFor="let s of selected_station2"> {{s}} </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="sep"> Setup station: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <select [(ngModel)]="sep" class="form-control" id="sep" name="sep">
+              <option *ngFor="let s of selected_station2"> {{s}} </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="cross"> Cross polarize </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <select [(ngModel)]="cross_polarize" class="form-control" id="cross" name="cross" required>
+              <option *ngFor="let pol of crosspolarization"> {{pol}} </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="channels"> Numbers of Channels: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="channels" class="form-control" id="channels" max="1048576" min="2" name="channels"
+                   required type="number"/>
+            <span *ngIf="!IsPowerOfTwo(channels)" style="color:red;">Number of channels is not base of two</span>
+            <br>
+            <span *ngIf="channels==null" style="color:red;">Please fill is not base of two</span>
+          </div>
+        </div>
+
+        <div *ngIf="multiphaseshow" class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="fft_size_correlation"> fft size correlation: </label>
+        </div>
+
+        <div *ngIf="multiphaseshow" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="fft_size_correlation" class="form-control" id="fft_size_correlation" max="1048576"
+                   min="2" name="fft_size_correlation" required type="number"/>
+            <span *ngIf="!IsPowerOfTwo(fft_size_correlation)" style="color:red;">Number of fft size correlation is not base of two</span>
+            <br>
+            <span *ngIf="isSmallerTonumbersOfchannels(fft_size_correlation)" style="color:red;">fft size correlation cannot be smaller than number of channels</span>
+          </div>
+        </div>
+
+        <div *ngIf="multiphaseshow" class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="fft_size_delay"> fft size delay: </label>
+        </div>
+
+        <div *ngIf="multiphaseshow" class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="fft_size_delay" class="form-control" id="fft_size_delay" max="1048576" min="2"
+                   name="fft_size_delay" required type="number" value="1024"/>
+            <span *ngIf="!IsPowerOfTwo(fft_size_delay)"
+                  style="color:red;">Number of fft size delay is not base of two</span>
+            <br>
+            <span *ngIf="isSmallerTonumbersOfchannels(fft_size_delay)" style="color:red;">fft size delay cannot be smaller than number of channels</span>
+          </div>
+        </div>
+      </div>
+
+      <div class=row>
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="multi"> Multi phase center </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <select (change)="select_multi($event)" [(ngModel)]="multiphaseOption" class="form-control" id="multi"
+                    name="multi">
+              <option *ngFor="let multi of multiphase"> {{multi}} </option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="multiphaseshow">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div>
+              <label for="multi_phase_scans"> Multi phase scans </label>
+            </div>
+
+            <div>
+              <select [(ngModel)]="multi_phase_scans" class="form-control" id="multi_phase_scans" multiple
+                      name="multi_phase_scans">
+                <option *ngFor="let scan of scans"> {{scan}} </option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <button (click)="send_ctrl()" [disabled]="!test_ctrl()" class="btn btn-success btn-xs" id="ctrl"
+                  type="submit"> {{ ctrlButtonName }}</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div  *ngIf="experimentType=='KANA'">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="experimentnameKana"> Experiment name: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 ">
+          <div class="form-group">
+            <input  [(ngModel)]="experimentname" class="form-control" id="experimentnameKana" name="experimentname" placeholder="F08L1" required type="text" />
+            <span *ngIf="experimentname.length==0" style="color:red;">Please fill experiment name</span>
+          </div>
+         </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="jobs"> Jobs: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <div class="form-group">
+            <select [(ngModel)]="selectedJob" id="jobs" name="jobs" class="form-control" required>
+              <option *ngFor="let job of jobs"> {{ job }} </option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="bufbegin"> Buffer begin: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input  [(ngModel)]="bufbegin" name="bufbegin" id="bufbegin" type="text" data-ng-model="bufbegin" data-ng-init="bufbegin='00s'" class="form-control" required />
+            <span *ngIf="bufbegin.length==0" style="color:red;">Please fill Buffer beginning</span>
+            <span *ngIf="!checkBuffer()" style="color:red;"> {{ bufferError}} </span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="bufbend"> Buffer end:</label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="bufbend" name="bufbend" id="bufbend" type="text" class="form-control" required />
+            <span *ngIf="bufbend.length==0" style="color:red;"> Please fill buffer end</span>
+            <span *ngIf="!checkBuffer()" style="color:red;"> {{ bufferError}}  </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row" *ngIf="selectedJob=='M3'">
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="delaybegin"> Delay begin: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="delaybegin" name="delaybegin" id="delaybegin" type="number" min="0" class="form-control" required />
+            <span *ngIf="!checkNumber(delaybegin)" style="color:red;"> Please fill delay beginning </span>
+            <span *ngIf="delaybegin<0" style="color:red;"> Delay beginning cannot be negative </span>
+            <span *ngIf="delaybegin>=delayend" style="color:red;"> Delay beginning cannot smaller or equal to delay end </span>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+          <label for="delayend"> Delay end: </label>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+          <div class="form-group">
+            <input [(ngModel)]="delayend" name="delayend" id="delayend" type="number" min="1" max="239" class="form-control" required />
+            <span *ngIf="!checkNumber(delayend)" style="color:red;"> Please fill delay end</span>
+            <span *ngIf="delayend<0" style="color:red;"> Delay end cannot be negative </span>
+            <span *ngIf="delaybegin>=delayend" style="color:red;"> Delay beginning cannot smaller or equal to delay end </span>
+            <span *ngIf="delayend>=240" style="color:red;"> Delay end must be lower than file size (240) </span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+          <div class="form-group">
+            <label for="realTimeKana"> Real time: </label>
+            <select [(ngModel)]="realTimeKana" class="form-control" id="realTimeKana" name="realTimeKana" required>
+              <option *ngFor="let r of realTimeKanaChoose"> {{r}} </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+          <label for="kanaDataDirectory"> Data directory: </label>
+          <input [(ngModel)]="kanaDataDirectory" name="kanaDataDirectory" id="kanaDataDirectory" type="text" class="form-control" required />
+          <span *ngIf="kanaDataDirectory.length==0" style="color:red;"> Must specify directory </span>
+        </div>
+      </div>
+
+      <div  *ngIf="realTimeKana=='True'" class="row">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="kanaInAddress"> In address: </label>
+          <input [(ngModel)]="kanaInAddress" name="kanaInAddress" id="kanaInAddress" type="text"  class="form-control" required />
+          <span *ngIf="kanaInAddress.length == 0" style="color:red;"> In address must be specify </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="kanaInPort"> In port: </label>
+          <input [(ngModel)]="kanaInPort" name="kanaInPort" id="kanaInPort" type="number" min="0" class="form-control" required />
+          <span *ngIf="!checkNumber(kanaInPort)" style="color:red;"> Please fill in port </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="kanaOutAddress"> Out address: </label>
+          <input [(ngModel)]="kanaOutAddress" name="kanaOutAddress" id="kanaOutAddress" type="text" class="form-control" required />
+          <span *ngIf="kanaOutAddress.length == 0" style="color:red;"> Out address must be specify </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="kanaOutPort"> Out port: </label>
+          <input [(ngModel)]="kanaOutPort" name="kanaOutPort" id="kanaOutPort" type="number" min="0"  class="form-control" required />
+          <span *ngIf="!checkNumber(kanaOutPort)" style="color:red;"> Please fill out port </span>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
+          <label for="rt_batch_length"> rt batch length: </label>
+          <input [(ngModel)]="rt_batch_length" name="rt_batch_length" id="rt_batch_length" type="number" min="0"  class="form-control" required />
+          <span *ngIf="!checkNumber(rt_batch_length)" style="color:red;"> Please fill batch length </span>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+          <button class="btn btn-success btn-xs" type="submit" (click)="send_kana_ctrl()" [disabled]="!test_ctrl_kana()"
+                  id="kanactrl"> {{ ctrlButtonName }} </button>
+        </div>
+      </div>
+
+    </div>
+
+  </form>
+</div>

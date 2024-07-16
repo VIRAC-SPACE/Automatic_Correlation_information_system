@@ -1,0 +1,23 @@
+{
+  "properties": [
+    {
+      "name": "Sspring.jpa.properties.hibernate.dialect",
+      "type": "java.lang.String",
+      "description": "Description for Sspring.jpa.properties.hibernate.dialect."
+    },
+    {
+      "name": "spring.datasource.testWhileIdle",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.testWhileIdle."
+    },
+    {
+      "name": "spring.datasource.validationQuery",
+      "type": "java.lang.String",
+      "description": "Description for spring.datasource.validationQuery."
+    },
+    {
+      "name": "spring.jpa.hibernate.naming-strategy",
+      "type": "java.lang.String",
+      "description": "Description for spring.jpa.hibernate.naming-strategy."
+    }
+  ] }

@@ -1,0 +1,139 @@
+<div>
+  <h2>Observation View</h2>
+
+  <h4>Choose project</h4>
+  <select class="form-control" multiple [(ngModel)]="selectedProjects" (ngModelChange)="onProjectSelect()">
+    <option *ngFor="let project of projects" [ngValue]="{ projectId: project.projectId, title: project.title }">{{ project.title }}</option>
+  </select>
+  <h3>Create new observation by uploading key file</h3>
+  <div class="btn-group">
+    <input type="file" (change)="onFileChange($event)" />
+    <button (click)="uploadFile()" class="btn btn-primary" [disabled]="!selectedProjects || !selectedFile">Upload File and save observation</button>
+  </div>
+
+
+  <h3>My observations</h3>
+  <table *ngIf="observations.length > 0" class="table-bordered">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Start Date (LST)</th>
+        <th>Start Date (UTC)</th>
+        <th>Copy (choose datetime)</th>
+        <th>Copy (to next week)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let observation of observations">
+        <td>{{ observation.expcode }}</td>
+        <td>{{ observation.dateTimeLST }}</td>
+        <td>{{ observation.dateTimeUTC }}</td>
+	        <td>
+          <ng-container>
+            <div class="btn-group">
+              <!-- "Copy (with time)" -->
+              <input type="checkbox" [id]="'createCopyCheckbox_' + observation.expcode" [(ngModel)]="observation.createCopy" (change)="onCreateCopyCheckboxChange(observation)">
+            </div>
+          </ng-container>
+        </td>
+        <td>
+          <ng-container>
+            <div class="btn-group">
+              <!-- "Copy to Next Week" -->
+              <input type="checkbox" [id]="'copyToNextWeekCheckbox_' + observation.expcode" [(ngModel)]="observation.copyToNextWeek" (change)="onCopyToNextWeekCheckboxChange(observation)">
+            </div>
+          </ng-container>
+        </td>
+        <td>
+          <ng-container>
+            <div class="btn-group">
+              <div *ngIf="observation.createCopy || observation.copyToNextWeek">
+                <label for="startDateTime">Start Date and LST Time: </label>
+                <input type="datetime-local" id="startDateTime" [(ngModel)]="observation.newGroupDateTime" [disabled]="observation.copyToNextWeek" />
+                <button *ngIf="observation.createCopy || observation.copyToNextWeek" (click)="createCopyInNewTable(observation)" class="btn btn-primary">Create Copy</button>
+              </div>
+            </div>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Update observation</h3>
+  <div class="btn-group">
+    <a [routerLink]="['/group']" class="btn btn-primary active" id="cor" role="button"> Plan new observation </a>
+   <button (click)="planObservationForAllGroupsNextWeek()" class="btn btn-primary">Plan observations for all groups next week</button>
+  </div>
+ 
+  <h2>Observations scheduling </h2>
+  <div *ngIf="newTableData.length > 0" class="table-bordered">
+    <button (click)="calculateUtcTimeForCopiedObservations()" class="btn btn-secondary">Check for availability</button>
+    <button (click)="clearTable()" class="btn btn-primary">Clear Observation Scheduling table</button>
+    <button (click)="sendDataToEndpoint()" class="btn btn-primary" [disabled]="!dataLoaded">Store Observations in DB and create vex files</button>
+  </div>
+
+
+ 
+
+  <table *ngIf="newTableData.length > 0" class="table-bordered">
+    <thead>
+      <tr>
+        <th>Base Obs Title</th>
+        <th>Start Datetime (LST)</th>
+        <th>Start Datetime (UTC)</th>
+        <th>End Datetime (UTC)</th>
+        <th>Duration (in hours)</th>
+        <th>Availability RT-32</th>
+	<th>Availability RT-16</th>
+	<th>Observation status</th>
+	<th>Create an observation</th> 
+      </tr>
+    </thead>
+    <tbody>
+	      <tr *ngFor="let row of newTableData">
+        <td>{{ row.expcode }}</td>
+        <td>{{ row.dateTime }}</td>
+        <td>{{ row.utcDateTimeStart }}</td>
+        <td>{{ row.utcDateTimeEnd }}</td>
+        <td>{{ row.durationInHours }}</td>
+        <td [ngClass]="{'text-success': row.status32 === true, 'text-danger': row.status32 === false}">
+          <ng-container *ngIf="dataLoaded">
+            {{ row.status32 !== null ? (row.status32 ? 'Available' : 'Unavailable') : '' }}
+          </ng-container>
+          <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+        </td>
+        
+        <td [ngClass]="{'text-success': row.status16 === true, 'text-danger': row.status16 === false}">
+          <ng-container *ngIf="dataLoaded">
+            {{ row.status16 !== null ? (row.status16 ? 'Available' : 'Unavailable') : '' }}
+          </ng-container>
+          <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+        </td>
+        <td>
+          <ng-container *ngIf="dataLoaded">
+            <ng-container *ngIf="row.status32 !== null && row.status16 !== null; else notKnown">
+              <ng-container *ngIf="row.status32 && row.status16; else notPossible">
+                <span style="color: green;">OK</span>
+              </ng-container>
+              <ng-template #notPossible>
+                <span style="color: red;">NOT POSSIBLE</span>
+              </ng-template>
+            </ng-container>
+            <ng-template #notKnown>
+              <span style="color: grey;">NOT KNOWN</span>
+            </ng-template>
+          </ng-container>
+          <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+        </td>
+        <td>
+<!--	<input type="checkbox" [checked]="row.status32 && row.status16"  [(ngModel)]="row.createObservation">
+-->
+          <input type="checkbox" [checked]="row.status32 && row.status16" [disabled]="!row.status32 || !row.status16" [(ngModel)]="row.createObservation">
+
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

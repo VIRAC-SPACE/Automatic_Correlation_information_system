@@ -1,0 +1,58 @@
+<header>
+  <div class="row">
+    <div class="page-header">
+      <h1>Welcome to results page</h1>
+    </div>
+  </div>
+</header>
+
+
+<main>
+  <div class="row">
+    <div class="bg-extended center-block">
+      <div class="align-vertical-center align-horizontal-center">
+        <div class="row">
+          <div class="col-xs-3 col-sm-6 col-md-12 col-lg-12">
+            <div class="well well-lg">
+              <div class="well-body">
+                <button (click)="check_results('fringe')"  class="btn btn-primary btn-lg active" id="fringe" role="button"> Fringe </button>
+                <button (click)="check_results('standartplots')" class="btn btn-primary btn-lg active" id="standartplots" role="button"> Standartplots </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div *ngIf="result_type=='fringe'">
+      <div *ngIf="experimentType=='SFXC'">
+        <p [innerHTML]="html" class="e2e-iframe-trusted-html"></p>
+      </div>
+
+      <div *ngIf="experimentType=='KANA'">
+        <div *ngFor="let src_link of kana_plot_src">
+          <img class="images" src='{{ src_link }}' alt="{{ src_link }}">
+        </div>
+      </div>
+
+    </div>
+
+    <div *ngIf="result_type=='standartplots'">
+      <main>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+            <img class='rotate45' *ngFor="let p of plot_names" src="{{serverData}}/results/getstandartplots/?name={{p}}">
+          </div>
+        </div>
+      </main>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+

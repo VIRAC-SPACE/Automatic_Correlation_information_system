@@ -1,0 +1,135 @@
+<div>
+  <h2>Group Planning</h2>
+
+  <div style="display: flex; align-items: flex-start;">
+    <!-- Tabula "Observation Groups" -->
+    <div style="flex: 1; margin-right: 20px;">
+      <h3>Observation Groups</h3>
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Start Time (LST)</th>
+            <th>Duration (in hours)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let group of formattedGroups">
+            <td>{{ group.groupObsTitles }}</td>
+            <td>{{ group.lstime }}</td>
+            <td>{{ group.duration }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- "Choose project" elements -->
+    <div style="flex: 1;">
+      <h4>Choose project</h4>
+      <select class="form-control" multiple [(ngModel)]="selectedProjects" (ngModelChange)="onProjectSelect()">
+        <option *ngFor="let project of projects" [ngValue]="{ projectId: project.projectId, title: project.title }">{{ project.title }}</option>
+      </select>
+    </div>
+  </div>
+
+  <h3>See observation possibilities</h3>
+  <label for="startDate">Start Date:</label>
+  <input type="date" id="startDate" [(ngModel)]="startDate" required>
+
+  <label for="endDate">End Date:</label>
+  <input type="date" id="endDate" [(ngModel)]="endDate" required>
+
+  <button (click)="calculateUtcTimeForCopiedObservations()" class="btn btn-primary">Calculate UTC and check availability</button>
+  <button (click)="sendDataToEndpoint()" class="btn btn-primary" [disabled]="!dataLoaded">Store Observations in DB and create vex files</button>
+  <button (click)="clearTable()" class="btn btn-primary">Clear Observation Scheduling table</button>
+  <div *ngIf="newTableDataByDate.length > 0">
+    <div *ngFor="let dateGroup of newTableDataByDate">
+      <h3>{{ dateGroup.date | date }}</h3>
+      <table class="table-bordered">
+        <thead>
+          <tr>
+            <th>Group Title</th>
+            <th>Start Datetime (LST)</th>
+            <th>Start Datetime (UTC)</th>
+            <th>End Datetime (UTC)</th>
+            <th>Duration (in hours)</th>
+            <th>Availability RT-32</th>
+            <th>Availability RT-16</th>
+            <th>Observation Status</th>
+            <th>Create an Observation</th>
+            <th>Choose Group</th>
+            <th>Observation Title</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let observation of dateGroup.observations">
+            <td>{{ observation.title }}</td>
+            <td>{{ observation.dateTime }}</td>
+            <td>{{ observation.utcDateTimeStart }}</td>
+            <td>{{ observation.utcDateTimeEnd }}</td>
+            <td>{{ observation.durationInHours }}</td>
+            <td [ngClass]="{'text-success': observation.status32 === true, 'text-danger': observation.status32 === false}">
+              <ng-container *ngIf="dataLoaded">
+                {{ observation.status32 !== null ? (observation.status32 ? 'Available' : 'Unavailable') : '' }}
+              </ng-container>
+              <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+            </td>
+  
+            <td [ngClass]="{'text-success': observation.status16 === true, 'text-danger': observation.status16 === false}">
+              <ng-container *ngIf="dataLoaded">
+                {{ observation.status16 !== null ? (observation.status16 ? 'Available' : 'Unavailable') : '' }}
+              </ng-container>
+              <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+            </td>
+            <td>
+              <ng-container *ngIf="dataLoaded">
+                <ng-container *ngIf="observation.status32 !== null && observation.status16 !== null; else notKnown">
+                  <ng-container *ngIf="observation.status32 && observation.status16; else notPossible">
+                    <span style="color: green;">OK</span>
+                  </ng-container>
+                  <ng-template #notPossible>
+                    <span style="color: red;">NOT POSSIBLE</span>
+                  </ng-template>
+                </ng-container>
+                <ng-template #notKnown>
+                  <span style="color: grey;">NOT KNOWN</span>
+                </ng-template>
+              </ng-container>
+              <span *ngIf="!dataLoaded" style="color: grey;">NOT KNOWN</span>
+            </td>
+            <td>
+            <!--  <input type="checkbox" [(ngModel)]="observation.check" [disabled]="!observation.status32 || !observation.status16 || observation.isOptionSet" (change)="toggleObservation(observation)">
+		-->
+	 <input type="checkbox" [(ngModel)]="observation.check"  (change)="toggleObservation(observation)">
+
+            </td>
+            <td [ngClass]="{'cell-border': true}">
+              <ng-container *ngIf="isBothStatusChecked(observation); else emptyCell">
+                <select [(ngModel)]="observation.selectedOption" [disabled]="observation.isOptionSet">
+                  <ng-container *ngFor="let option of observation.title.split(','); let i = index">
+                    <option [value]="option.trim()">
+                      {{ option.trim() }} ({{ getCounter(option.trim()) }})
+                    </option>
+                  </ng-container>
+                </select>
+              </ng-container>
+              <ng-template #emptyCell>
+                <span></span>
+              </ng-template>
+            </td>
+            <td [ngClass]="{'cell-border': true}">
+              <ng-container *ngIf="isBothStatusChecked(observation); else emptyTextCell">
+             <!--   {{ getNextLetterCounter(observation.selectedOption) }}-->
+             {{ observation.isOptionSet ? observation.selectedOption : '' }}
+              </ng-container>
+              <ng-template #emptyTextCell>
+                <span></span>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

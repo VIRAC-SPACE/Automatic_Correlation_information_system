@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: /home/janis/.gradle/caches/modules-2/files-2.1/com.mysql/mys
+ ql-connector-j/8.0.31/3fd5850719d7e82d50705d34cc6a0037fab5731f
+

@@ -1,0 +1,44 @@
+<header>
+  <div class="row">
+    <div class="page-header">
+      <h1>Start correlation </h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="row">
+    <div class="bg-extended">
+      <div class="align-vertical-center">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div class="well well-lg">
+              <div class="well-body">
+                <a class="btn bg-primary btn-lg active" href={{returnvexfileurl}} role="button"
+                   target="_blank"> View vix file of observation {{currentOBS}} </a>
+                <a class="btn bg-primary btn-lg active" href={{returncontrolfileurl}}
+                   role="button" target="_blank"> View control file of observation {{currentOBS}} </a>
+                <a [routerLink]="['/startpage']" class="btn bg-primary btn-lg" role="button"> Back </a>
+                <a (click)="start_correlation()" class="btn btn-success btn-lg" id="correlation" role="button">
+                  Correlation observation {{currentOBS}}
+                </a>
+              </div>
+            </div>
+
+            <div *ngIf="correlationStarted">
+              <div class="loader col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
+              <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Correlation for observation {{currentOBS}} in progress. Please wait</p>
+            </div>
+
+            <div *ngIf="exitValue" style="color: red">
+              <div>
+                {{errorMessage}}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

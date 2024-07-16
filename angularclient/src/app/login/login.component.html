@@ -1,0 +1,53 @@
+<style>
+  .navbar {
+    display: none;
+  }
+</style>
+
+
+<div class="row Absolute-Center is-Responsive">
+  <div class="Absolute-Center is-Responsive">
+    <form #userlogin="ngForm" (ngSubmit)="login(userlogin.value)" class="pure-form" name="loginForm" role="form">
+      <fieldset class="form-group">
+        <label for="email">Email:</label>
+        <input [(ngModel)]="email" class="form-control" id="email" name="email" pattern="email_pattern" placeholder="user@user.com"
+               required="required" type="email"/>
+
+        <small [hidden]="email.length>0" style="color: red"> Email is required. </small>
+        <p></p>
+
+        <div *ngIf="!test_email(email)">
+          <small style="color: red"> Email is not valid </small>
+        </div>
+
+
+      </fieldset>
+
+      <fieldset class="form-group">
+        <label for="password">Password:</label>
+        <input [(ngModel)]="password" class="form-control" id="password" minlength="8" name="password"
+               placeholder="password" required="required" type="password"/>
+        <small [hidden]="password.length>7" style="color: red"> Password has to be at least 8 symbols </small>
+
+      </fieldset>
+
+
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <button (click)="ForgetYourPassword()" class="btn btn-primary navbar-right" type="button"> Forget your
+          password
+        </button>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="form-actions">
+          <button [disabled]="password.length<8 || !test_email(email)" class="btn btn-success navbar-right"
+                  type="submit"> Login
+          </button>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+

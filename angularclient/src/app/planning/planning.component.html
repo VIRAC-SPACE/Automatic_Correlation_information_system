@@ -1,0 +1,56 @@
+<div>
+  <h2>Planning New observation</h2>
+
+  <div style="display: flex; gap: 10px;">
+    <label for="newGroupName">Title of New Observation: </label>
+    <input type="text" id="newGroupName" [(ngModel)]="newGroupName" />
+
+    <label for="startDateTime">Start Date and LST Time: </label>
+    <input type="datetime-local" id="startDateTime" [(ngModel)]="newGroupDateTime" />
+
+    <button (click)="createNewGroup()">Create New Observation</button>
+
+    <label for="searchTerm">Enter Search Source for the Observation (at least 2 characters): </label>
+    <input type="text" id="searchTerm" [formControl]="searchTerm" [matAutocomplete]="auto" />
+  </div>
+
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let result of searchResults" [value]="result.title" (click)="addToSelected(result)">
+      {{ result.title }}
+    </mat-option>
+  </mat-autocomplete>
+
+  <table *ngIf="searchResults.length > 0">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Right Ascension</th>
+        <th>Declination</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let result of searchResults">
+        <td>{{ result.title }}</td>
+        <td>{{ result.rightAscension }}</td>
+        <td>{{ result.declination }}</td>
+        <td>
+          <button (click)="addToSelected(result)">Add</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Selected sources</h3>
+  <ul>
+    <li *ngFor="let group of selectedGroups">
+      <strong>{{ group.title }}</strong>
+      <p>Start Date time: {{ group.startDateTime }}</p>
+      <ul>
+        <li *ngFor="let source of group.sources!">{{ source.title }}</li>
+      </ul>
+    </li>
+  </ul>
+
+  <button (click)="addAllGroupsToObservation()">Save all observations</button>
+</div>

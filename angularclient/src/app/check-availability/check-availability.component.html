@@ -1,0 +1,39 @@
+<!-- date-time-picker.component.html -->
+<div class="row">
+
+  <div>
+      <label for="startDateTime">Start Date and Time:</label>
+      <input type="datetime-local" id="startDateTime" [(ngModel)]="startDateTime" required>
+
+      <label for="endDateTime">End Date and Time:</label>
+      <input type="datetime-local" id="endDateTime" [(ngModel)]="endDateTime" required>
+
+      <label for="options">Select Options:</label>
+      <select id="options" multiple [(ngModel)]="selectedOptions">
+          <option value="RT-32">RT-32</option>
+          <option value="RT-16">RT-16</option>
+          <option value="LOFAR">LOFAR</option>
+      </select>
+
+      <button (click)="validateAndSubmit()">Submit</button>
+  </div>
+
+  <div *ngIf="showTable && availabilityResults">
+      <h3>Availability Table</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Antenna</th>
+            <th>Availability</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let antenna of availabilityResults.antennas; let i = index">
+            <td>{{ antenna || 'N/A' }}</td>
+            <td>{{ availabilityResults.availability?.[i] ? 'Available' : 'Not Available' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+</div>

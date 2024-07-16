@@ -1,0 +1,290 @@
+<style>
+
+  #view {
+    display: none;
+  }
+
+  #create {
+    display: none;
+  }
+
+</style>
+
+
+<header>
+  <div class="row">
+    <div class="page-header">
+      <h1> Welcome to admin page </h1>
+    </div>
+  </div>
+</header>
+
+<div class="row">
+  <button class="btn btn-success btn-lg" data-target="#CreateUserForm" data-toggle="modal">Create User</button>
+  <button class="btn btn-primary btn-lg" data-target="#EditUserForm" data-toggle="modal">Edit User</button>
+  <button class="btn btn-danger btn-lg" data-target="#DeleteUserForm" data-toggle="modal">Delete User</button>
+  <button class="btn btn-danger btn-lg" data-target="#DeleteExperimentForm" data-toggle="modal">Delete Experiment
+  </button>
+</div>
+
+<div aria-labelledby="myModalLabel" class="modal fade" id="CreateUserForm" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="form-group">
+        <form class="pure-form" name="createusr" role="form">
+          <div class="modal-header">
+            <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" id="myModalLabel">Create User Form</h4>
+          </div>
+
+          <div class="modal-body">
+            <fieldset class="form-group">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="create_email"> Email: </label>
+                  <input [(ngModel)]="create_email" class="form-control" id="create_email" name="create_email"
+                         required="required" type="email"/>
+                  <span *ngIf="!test_email(create_email)" style="color:red;">Not a valid email</span>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="create_password"> Password: </label> <input [(ngModel)]="create_password" class="form-control"
+                                                                          id="create_password" name="create_password"
+                                                                          required="required"
+                                                                          type="password"/>
+                  <span [hidden]="create_password.length>7"
+                        style="color:red;">Password has to be at least 8 symbols</span>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="create_first_name"> First Name: </label> <input [(ngModel)]="create_first_name"
+                                                                              class="form-control"
+                                                                              id="create_first_name" name="create_first_name"
+                                                                              required="required"
+                                                                              type="text"/>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="create_last_name"> LastName: </label> <input [(ngModel)]="create_last_name"
+                                                                           class="form-control" id="create_last_name"
+                                                                           name="create_last_name" required="required"
+                                                                           type="text"/>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                  <label for="create_role"> Role: </label> <select [(ngModel)]="create_role" class="form-control"
+                                                                   id="create_role" name="create_role"
+                                                                   required="required">
+                  <option> admin</option>
+                  <option> user</option>
+                </select>
+                </div>
+              </div>
+            </fieldset>
+
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+            <button (click)="createuser()" [disabled]="create_password.length<8 || !test_email(create_email)" class="btn btn-success" data-dismiss="modal" id="CreateUser"
+                    type="submit">Create User
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div aria-labelledby="myModalLabel" class="modal fade" id="EditUserForm" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form class="pure-form" name="editusr" role="form">
+        <div class="modal-header">
+          <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel">User Edit Form</h4>
+        </div>
+
+        <div class="modal-body">
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label>Select User</label> <select (ngModelChange)="useeditchange($event)" [(ngModel)]="changeuser" class="form-control"
+                                                   name=changeuser>
+                <option *ngFor="let user of users"> {{user.fullname}} </option>
+              </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="edit_email"> Email: </label> <input [(ngModel)]="edit_email" class="form-control"
+                                                                id="edit_email" name="edit_email" required="required"
+                                                                type="email"/>
+                <span *ngIf="!test_email(edit_email)" style="color:red;">Not a valid email</span>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="edit_password"> Password: </label> <input [(ngModel)]="edit_password" class="form-control"
+                                                                      id="edit_password" name="edit__password"
+                                                                      required="required" type="password"/>
+                <span [hidden]="edit_password.length>7" style="color:red;">Password has to be at least 8 symbols</span>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="edit_first_name"> First Name: </label> <input [(ngModel)]="edit_first_name"
+                                                                          class="form-control" id="edit_first_name"
+                                                                          name="edit_first_name" required="required"
+                                                                          type="text"/>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="edit_last_name"> LastName: </label> <input [(ngModel)]="edit_last_name"
+                                                                       class="form-control" id="edit_last_name"
+                                                                       name="edit_last_name" required="required"
+                                                                       type="text"/>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="edit_role"> Role: </label> <select [(ngModel)]="edit_role" class="form-control"
+                                                               id="edit_role" name="edit_role" required="required">
+                <option> admin</option>
+                <option> user</option>
+              </select>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+          <button (click)="editeuser()" [disabled]="edit_password.length<8 || !test_email(edit_email)" class="btn btn-primary" data-dismiss="modal" id="EditUser"
+                  type="submit">Edit User
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<div aria-labelledby="myModalLabel" class="modal fade" id="DeleteUserForm" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form name="deleteusr">
+        <div class="modal-header">
+          <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel">User Delete Form</h4>
+        </div>
+
+        <div class="modal-body">
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <label for="deleteeuser">Select User</label> <select [(ngModel)]="deleteeuser" class="form-control"
+                                                                     id="deleteeuser" name=deleteeuser>
+                <option *ngFor="let user of users"> {{user.fullname}} </option>
+              </select>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+          <button (click)="deleteuser()" class="btn btn-danger" data-dismiss="modal" id="DeleteUser" type="submit">
+            Delete User
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<div aria-labelledby="myModalLabel" class="modal fade" id="DeleteExperimentForm" role="dialog" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form name="deleteexperiment">
+        <div class="modal-header">
+          <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" id="myModalLabel">Experiment Delete Form</h4>
+        </div>
+
+        <div class="modal-body">
+          <fieldset class="form-group">
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div [hidden]="experiments.length == 0">
+                  <label>Select Experiment</label> <select [(ngModel)]="deleteexperiment" class="form-control"
+                                                           name=deleteexperiment>
+                  <option *ngFor="let experiment of experiments"> {{experiment.name}} </option>
+                </select>
+                </div>
+
+                <div [hidden]="experiments.length != 0">
+                  <h4> No Experiments are created yet </h4>
+                </div>
+
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+          <button (click)="delete_experiment()" class="btn btn-danger" data-dismiss="modal" id="DeleteExperiment"
+                  type="submit">Delete Experiment
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+

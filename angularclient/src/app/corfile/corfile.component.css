@@ -1,0 +1,19 @@
+BODY, TH, TD {
+  font-size: 10pt
+}
+
+.popup_img a {
+  position: relative;
+}
+
+.popup_img a img {
+  position: absolute;
+  display: none;
+  top: 20;
+  height: 200;
+  z-index: 99;
+}
+
+.popup_img a:hover img {
+  display: block;
+}

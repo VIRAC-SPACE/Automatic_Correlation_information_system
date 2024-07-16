@@ -1,0 +1,45 @@
+<header>
+  <div class="row">
+    <div class="page-header">
+      <h1> Add clock block </h1>
+    </div>
+  </div>
+</header>
+
+<div class="row">
+  <form class="pure-form aalign-items-start justify-content-start no-gutters" name="clockForm" role="form">
+    <div class="table-responsive-sm aalign-items-start justify-content-start no-gutters">
+      <table class="table table-hover table-sm" style="width:100%">
+        <thead class="thead-dark">
+        <tr>
+          <th scope="col" style="text-align:center;">Station</th>
+          <th scope="col" style="text-align:center;">Clock early</th>
+          <th scope="col" style="text-align:center;">Rate</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let station of AllStations">
+          <td scope="row" style="text-align:center;"> {{station}} </td>
+
+          <td style="text-align:center;">
+            <input (change)="validclocks($event)" class="form-control" id="{{ 'ClockEarly-' + station}}" min="0" required
+                   type="number"/>
+          </td>
+
+          <td style="text-align:center;">
+            <input (change)="validclocks($event)" class="form-control" id="{{ 'Rate-' + station}}" min="0" required
+                   type="number"/>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row form-actions">
+      <button (click)="addclocks()" [disabled]="!clocks_valid" class="btn btn-success" id="clock"
+              type="submit"> {{ clockButtonName }} </button>
+    </div>
+
+  </form>
+</div>

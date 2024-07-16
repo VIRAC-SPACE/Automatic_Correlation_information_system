@@ -1,0 +1,210 @@
+<header>
+  <div class="row justify-content-center text-center">
+    <div class="page-header justify-content-center text-center">
+      <h1>Hello {{ loggedUserName }} </h1>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="row">
+    <div class="bg-extended center-block">
+      <div class="align-vertical-center align-horizontal-center">
+        <div class="row">
+          <div class="col-xs-3 col-sm-6 col-md-12 col-lg-12">
+            <div class="well well-lg">
+              <div class="well-body">
+                <a [routerLink]="['/plan-home']" class="btn btn-primary btn-lg active" id="plan-home" role="button"> Plan observations of RT-32 and RT-16 interferometer </a>
+                <a  class="btn btn-primary btn-lg active" id="lofar" role="button"> Plan observations of LOFAR </a>
+                <a [routerLink]="['/check-availability']" class="btn btn-primary btn-lg active" id="check-availability" role="button"> Check Availability of Antennas </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <h3>My observations</h3>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="myObservationCheckbox" [(ngModel)]="myObservationActual">
+      <label class="form-check-label" for="myObservationCheckbox">Only 7 days before and 7 days after today</label>
+    </div>
+    <div class="filters">
+      <label for="titleFilter">Title:</label>
+      <input type="text" id="titleFilter" [(ngModel)]="titleFilter">
+
+      <label for="antennaFilter">Antennas:</label>
+      <select id="antennaFilter" [(ngModel)]="selectedAntenna">
+        <option value="">All</option>
+        <option *ngFor="let antenna of antennas">{{ antenna }}</option>
+      </select>
+
+      <label for="projectFilter">Projects:</label>
+      <select id="projectFilter" [(ngModel)]="selectedProject">
+        <option value="">All</option>
+        <option *ngFor="let project of projects">{{ project }}</option>
+      </select>
+
+      <label for="statusFilter">Observation Status:</label>
+      <select id="statusFilter" [(ngModel)]="selectedStatus">
+        <option value="">All</option>
+        <option *ngFor="let status of observationStatuses">{{ status }}</option>
+      </select>
+
+      <label for="dataProcessingStatusFilter">Data Processing Status:</label>
+      <select id="dataProcessingStatusFilter" [(ngModel)]="selectedDataProcessingStatus">
+        <option value="">All</option>
+        <option *ngFor="let status of dataProcessingStatuses">{{ status }}</option>
+      </select>
+
+
+      <button (click)="applyFilters()">Filter</button>
+      <button (click)="clearFilters()">Clear All Filters</button>
+    </div>
+
+    <table *ngIf="observations.length > 0" class="table-bordered">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Start Date (UTC)</th>
+          <th>Antennas</th>
+          <th>Projects</th>
+          <th>Observation status</th>
+          <th>Data processing status</th>
+          <th>Results</th>
+          <th>Start data processing?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let observation of observations">
+          <td>{{ observation.expcode }}</td>
+          <td>{{ observation.dateTimeUTC }}</td>
+          <td>{{ observation.antennas}}</td>
+          <td>
+            <ul>
+              <li *ngFor="let project of observation.projects">{{ project.title }}</li>
+            </ul>
+          </td>
+          <td>
+            <ng-container *ngIf="isNotStarted(observation)">
+              Not started yet
+            </ng-container>
+            <ng-container *ngIf="isInProgress(observation)">
+              In progress
+            </ng-container>
+            <ng-container *ngIf="!isNotStarted(observation) && !isInProgress(observation)">
+              Done
+            </ng-container>
+          </td>
+
+          <td>
+            <ng-container *ngIf="!isDataProcessingDone(observation)">
+              Not started yet
+            </ng-container>
+            <ng-container *ngIf="isDataProcessingDone(observation)">
+              Done
+            </ng-container>
+          </td>
+
+          <td>
+            <ng-container *ngIf="!isDataProcessingDone(observation)">
+              n/a
+            </ng-container>
+            <ng-container *ngIf="isDataProcessingDone(observation)">
+              <a href={{getDataprocessingLink(observation)}}  target="_blank"> {{observation.expcode}} </a>
+            </ng-container>
+          </td>
+
+          <td>
+       <input type="checkbox" *ngIf="!isDataProcessingDone(observation) && (!isNotStarted(observation) && !isInProgress(observation))" [(ngModel)]="observation.isChecked">
+           </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#dataProcessingInputModal" [disabled]="!isAnyObservationChecked()" (click)="openModalAndLoadData()">Start data processing</button>
+
+    <div class="modal fade" id="dataProcessingInputModal" tabindex="-1" role="dialog" aria-labelledby="dataProcessingInputModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+            <h5> Check correlator</h5>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="correlator" id="flexRadioDefault7" checked (change)="onCorrelationChange('SFXC')" >
+              <label class="form-check-label" for="flexRadioDefault7"> SFXC </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="correlator" id="flexRadioDefault8"  (change)="onCorrelationChange('KANA')">
+              <label class="form-check-label" for="flexRadioDefault8"> KANA </label>
+            </div>
+            <hr>
+
+            <div *ngIf="correlator=='SFXC'">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="correlator_type" id="flexRadioDefault1" checked (change)="onCorrelationTypeChange('single')" >
+                <label class="form-check-label" for="flexRadioDefault1"> Single Scan Correlation </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="correlator_type" id="flexRadioDefault2"  (change)="onCorrelationTypeChange('multi')">
+                <label class="form-check-label" for="flexRadioDefault2"> Multi Scan Correlation </label>
+              </div>
+
+              <div *ngIf="correlator_type=='multi'">
+                <hr>
+               <h5> Check correlation algorithms</h5>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="flexRadioDefault3" name="correlation_algorithms" (change)="onCorrelationPassChange('Contiuum')">
+                  <label class="form-check-label" for="flexRadioDefault3"> Contiuum pass </label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="flexRadioDefault4" name="correlation_algorithms" (change)="onCorrelationPassChange('Line')">
+                  <label class="form-check-label" for="flexRadioDefault4"> Line pass </label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="flexRadioDefault5" checked name="correlation_algorithms"  (change)="onCorrelationPassChange('Contiuum_Line')">
+                  <label class="form-check-label" for="flexRadioDefault5"> Contiuum pass + Line pass </label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" id="flexRadioDefault6" name="correlation_algorithms" (change)="onCorrelationPassChange('All')">
+                  <label class="form-check-label" for="flexRadioDefault6"> All pass </label>
+                </div>
+
+                <hr>
+
+                <h5> Check data processing pipeline </h5>
+                <div *ngFor="let pipeline of pipelines" class="form-check">
+                  <input class="form-check-input" type="checkbox" [id]="pipeline.id" [checked]="pipeline.checked" name="data_processing_pipeline" (change)="onPipelineSelect(pipeline)">
+                  <label class="form-check-label" [for]="pipeline.id">{{ pipeline.title }}</label>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="select_correlation_type()">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>

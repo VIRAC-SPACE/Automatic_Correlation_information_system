@@ -1,0 +1,171 @@
+<header>
+  <div class="row">
+    <div class="page-header">
+      <h1> View experiment {{experimentName}} {{experimentType}}</h1>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="row">
+    <div class="bg-extended">
+      <div class="align-vertical-center">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div *ngIf="experimentType=='SFXC'" class="well well-lg">
+              <div class="well-body">
+                <a class="btn bg-primary btn-lg active" href="{{serverData}}/vex/returnvexfile" role="button"
+                   target="_blank"> View vix file </a>
+                <a class="btn bg-primary btn-lg active" href="{{serverData}}/ctlr/returncontrolfile"
+                   role="button" target="_blank"> View control file </a>
+                <a [routerLink]="['/ctrl']" class="btn bg-primary btn-lg" id="changeControlFile" role="button"> Change
+                  Control File </a>
+                <a [routerLink]="['/clock']" class="btn bg-primary btn-lg" role="button"> Change clock block </a>
+                <a class="btn bg-primary btn-lg" href="{{serverData}}/experiments/downloadexperiment"
+                   role="button" target="_blank"> Download experiment </a>
+                <a (click)="start_correlation()" class="btn btn-success btn-lg" id="correlation" role="button">Do
+                  Correlation again </a>
+              </div>
+
+              <div *ngIf="correlationStarted">
+                <div class="loader col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
+                <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Correlation in progress. Please wait</p>
+              </div>
+
+              <div *ngIf="correlator_type=='multi'">
+
+                <br> <br> <br>
+
+                <a class="btn btn-primary btn-lg active" id="fringe" role="button" (click)="selectPlots('fringe')"> Fringe </a>
+                <a class="btn btn-primary btn-lg active" id="standartplots" role="button" (click)="selectPlots('standartplots')"> standartplots </a>
+
+                <div *ngIf="passType=='Contiuum_Line'">
+                  <a class="btn btn-primary btn-lg active" id="aips" role="button" (click)="selectPlots('aips')"> aips </a>
+                </div>
+
+                <div *ngIf="plottype=='fringe'">
+                  <br> <br> <br>
+
+                  <div *ngIf="passType=='Line'">
+                    <h5> View Line pass Correlation </h5>
+                    <a *ngFor="let scan of scans" class="btn btn-primary btn-lg active" id="{{passType+scan}}" (click)="onScanChange(scan)" role="button"> {{scan}} </a>
+                    <br> <br> <br>
+                  </div>
+
+                  <div *ngIf="passType=='Contiuum'">
+                    <h5> View Contiuum pass Correlation </h5>
+                    <a *ngFor="let scan of scans" class="btn btn-primary btn-lg active" id="{{passType+scan}}" (click)="onScanChange(scan)" role="button"> {{scan}} </a>
+                    <br> <br> <br>
+                  </div>
+
+                  <div *ngIf="passType=='Contiuum_Line'">
+                    <a class="btn btn-primary btn-lg active" id="fringeLine" (click)="onPassChange('Line')" role="button"> Line Pass </a>
+                    <a class="btn btn-primary btn-lg active" id="fringeContiuum" (click)="onPassChange('Contiuum')" role="button"> Contiuum Pass </a>
+
+                    <br> <br> <br>
+
+                    <a *ngFor="let scan of scans" class="btn btn-primary btn-lg active" id="{{passType+scan}}" (click)="onScanChange(scan)" role="button"> {{scan}} </a>
+                  </div>
+
+                  <div *ngIf="passType=='All'">
+                    <h5> View All pass Correlation </h5>
+                    <a *ngFor="let scan of scans" class="btn btn-primary btn-lg active" id="{{passType+scan}}" (click)="onScanChange(scan)" role="button"> {{scan}} </a>
+                  </div>
+
+                  <div class="row">
+                    <p [innerHTML]="html" class="e2e-iframe-trusted-html"></p>
+                  </div>
+
+                </div>
+
+                <div *ngIf="plottype=='standartplots'">
+                  <br> <br> <br>
+                  <div *ngIf="passType=='Line'">
+                    <h5> View Line pass Correlation </h5>
+                    <a *ngFor="let source of sources" class="btn btn-primary btn-lg active" id="{{passType+source}}" (click)="onSourceChange(source)"  role="button"> {{source}} </a>
+                  </div>
+
+                  <div *ngIf="passType=='Contiuum'">
+                    <h5> View Contiuum pass Correlation </h5>
+                    <a *ngFor="let source of sources" class="btn btn-primary btn-lg active" id="{{passType+source}}" (click)="onSourceChange(source)" role="button"> {{source}} </a>
+                  </div>
+
+                  <div *ngIf="passType=='Contiuum_Line'">
+                    <a class="btn btn-primary btn-lg active" id="standartplotsLine" (click)="onPassChange('Line')" role="button"> Line Pass </a>
+                    <a class="btn btn-primary btn-lg active" id="standartplotsContiuum" (click)="onPassChange('Contiuum')"role="button"> Contiuum Pass </a>
+
+                    <br> <br> <br>
+
+                    <a *ngFor="let source of sources" class="btn btn-primary btn-lg active" id="{{passType+source}}" (click)="onSourceChange(source)" role="button"> {{source}} </a>
+                  </div>
+
+                  <div *ngIf="passType=='All'">
+                    <h5> View All pass Correlation </h5>
+                    <a *ngFor="let source of sources" class="btn btn-primary btn-lg active" id="{{passType+source}}" (click)="onSourceChange(source)" role="button"> {{source}} </a>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-2 col-lg-2">
+                      <div  *ngIf="passType=='Contiuum_Line'">
+                        <img class='rotate45' *ngFor="let p of plot_names" src="{{serverData}}results/getstandartplotsmulti?name={{p}}&passType={{passType2}}&source={{source}}&exp_code={{experimentName}}">
+                      </div>
+
+                      <div *ngIf="passType!='Contiuum_Line'">
+                        <img class='rotate45' *ngFor="let p of plot_names" src="{{serverData}}results/getstandartplotsmulti?name={{p}}&passType={{passType}}&source={{source}}&exp_code={{experimentName}}">
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+                <div *ngIf="plottype=='aips'">
+                  <br><br><br>
+
+                  <div  *ngFor="let p of aipsPlotNames" >
+
+                    <div class="ratio-16x9 embed-responsive embed-responsive-item">
+                      <pdf-viewer id="pdf-canvas" [src]="getPDFsrc(p)"
+                                  [render-text]="true"
+                                  [original-size]="true"
+                                  [zoom-scale]="'page-width'"
+                                  [show-all]="true"
+                                  style="width: 1000px; height: 1000px"
+                      ></pdf-viewer>
+                    </div>
+
+                  </div>
+
+                </div>
+            </div>
+          </div>
+
+            <div *ngIf="experimentType=='KANA'" class="well well-lg">
+              <div class="well-body">
+                <a class="btn bg-primary btn-lg active" href="{{serverData}}/vex/returnvexfile" role="button"
+                   target="_blank"> View vix file </a>
+                <a class="btn bg-primary btn-lg active" href="{{serverData}}/ctlr/returncontrolfile"
+                   role="button" target="_blank"> View control file </a>
+                <a [routerLink]="['/ctrl']" class="btn bg-primary btn-lg" id="changeControlFileKana" role="button"> Change
+                  Control File </a>
+                <a class="btn bg-primary btn-lg" href="{{serverData}}/experiments/downloadexperiment"
+                   role="button" target="_blank"> Download experiment </a>
+
+                <a (click)="start_correlation()" class="btn btn-success btn-lg" id="correlationKana" role="button">Do
+                  Correlation again </a>
+              </div>
+
+              <div *ngIf="correlationStarted">
+                <div class="loader col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
+                <p class="col-xs-12 col-sm-12 col-md-12 col-lg-12">Correlation in progress. Please wait</p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+

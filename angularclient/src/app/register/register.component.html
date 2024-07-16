@@ -1,0 +1,71 @@
+<style>
+  #logout {
+    line-height: 0;
+    font-size: 0;
+    color: transparent;
+  }
+</style>
+
+<form class="pure-form" name="registration" role="form">
+  <fieldset class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <label for="email">Email:</label>
+        <input [(ngModel)]="email" class="form-control" id="email" name="email" pattern="email_pattern" required="required"
+               type="email"/>
+        <small [hidden]="email.length>0" style="color: red"> Email is required. </small>
+        <p></p>
+        <div *ngIf="!test_email(email)">
+          <small style="color: red"> Email is not valid </small>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+
+  <fieldset class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <label for="password">Password:</label>
+        <input [(ngModel)]="password" class="form-control" id="password" minlength="8" name="password"
+               placeholder="password" required="required" type="password"/>
+        <small [hidden]="password.length>7" style="color: red"> Password has to be at least 8 symbols </small>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <label for="name"> Name: </label> <input [(ngModel)]="name" class="form-control" id="name" name="name"
+                                                 type="text">
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <label for="lastname"> Last Name: </label> <input [(ngModel)]="lastname" class="form-control" id="lastname" name="lastname"
+                                                          type="text"/>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="form-group">
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <label for="role"> Role: </label> <select [(ngModel)]="role" class="form-control" id="role" name="role"
+                                                  required="required">
+        <option> admin</option>
+        <option> user</option>
+      </select>
+      </div>
+    </div>
+  </fieldset>
+
+  <button (click)="registration()"
+          [disabled]="password.length<8 || !test_email(email) || name.length==0 || lastname.length==0" class="btn btn-success"
+          type="submit">Send a request
+  </button>
+</form>
